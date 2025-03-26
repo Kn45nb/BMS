@@ -61,6 +61,7 @@ target_link_libraries(Smart-Battery
         hardware_i2c
         hardware_pio
         pico_cyw43_arch_none
+        hardware_spi
         )
 
 pico_add_extra_outputs(Smart-Battery)

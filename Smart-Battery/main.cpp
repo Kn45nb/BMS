@@ -10,7 +10,7 @@ CMake:		v4.0.0-rc5
 
 
 /*============================================================================================================================================================================
-Include	Lib
+Include     Lib                     Description
 ============================================================================================================================================================================*/
 // Base
 #include	<stdio.h>
@@ -19,9 +19,11 @@ Include	Lib
 
 // SDK Pico
 #include	"pico/stdlib.h"
+#include	"hardware/spi.h"
 #include	"hardware/i2c.h"
 #include	"hardware/uart.h"
-#include	"pico/cyw43_arch.h"     // Wireless
+#include    "hardware/gpio.h"
+#include	"pico/cyw43_arch.h"     // Wireless (Optional)
 
 
 // Other Lib
@@ -46,10 +48,10 @@ Defines     Var                             Val             Mô tả
 #define     I2C_SCL                         9
 #define     I2C_SLAVE_ADDR                  0xB            // SMBus Host Slave Interface: 0x8, Smart Battery Charger/Charger Selector or Charger System Manager: 0x9, Smart Battery System Manager or Smart Battery Selector: 0xA, Smart Battery: 0xB
 
-// I2C_1 defines
-#define     I2C_PORT_1                      i2c1
-#define     I2C_SDA                         12
-#define     I2C_SCL                         13
+// // I2C_1 defines
+// #define     I2C_PORT_1                      i2c1
+// #define     I2C_SDA                         12
+// #define     I2C_SCL                         13
 
 
 
