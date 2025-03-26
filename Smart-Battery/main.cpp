@@ -35,18 +35,18 @@ Include     Lib                     Description
 Defines     Var                             Val             Mô tả
 ============================================================================================================================================================================*/
 // SPI defines
-#define     SPI_PORT                        spi0
-#define     PIN_MISO                        16
-#define     PIN_CS                          17
-#define     PIN_SCK                         18
-#define     PIN_MOSI                        19
+#define     SPI_0_PORT                      spi0
+#define     SPI_0_MISO                      16
+#define     SPI_0_CS                        17
+#define     SPI_0_SCK                       18
+#define     SPI_0_MOSI                      19
 
 
 // I2C_0 defines
-#define     I2C_PORT_0                      i2c0
-#define     I2C_SDA                         8
-#define     I2C_SCL                         9
-#define     I2C_SLAVE_ADDR                  0xB            // SMBus Host Slave Interface: 0x8, Smart Battery Charger/Charger Selector or Charger System Manager: 0x9, Smart Battery System Manager or Smart Battery Selector: 0xA, Smart Battery: 0xB
+#define     I2C_0_PORT                      i2c0
+#define     I2C_0_SDA                       8
+#define     I2C_0_SCL                       9
+#define     I2C_0_SLAVE_ADDR                0xB            // SMBus Host Slave Interface: 0x8, Smart Battery Charger/Charger Selector or Charger System Manager: 0x9, Smart Battery System Manager or Smart Battery Selector: 0xA, Smart Battery: 0xB
 
 // // I2C_1 defines
 // #define     I2C_PORT_1                      i2c1
@@ -55,12 +55,11 @@ Defines     Var                             Val             Mô tả
 
 
 
-// // UART defines (default UART 'uart0')
-// #define     UART_ID                         uart1
-// #define     BAUD_RATE                       115200
-// // PIN
-// #define     UART_TX_PIN                     4
-// #define     UART_RX_PIN                     5
+// UART define
+#define     UART_0_PORT                         uart0
+#define     UART_0_BAUD_RATE                       115200
+#define     UART_0_TX                     0
+#define     UART_0_RX                     1
 
 
 
@@ -224,6 +223,47 @@ void blink(uint16_t TIME_BLINK)
     sleep_ms(TIME_BLINK);
 }
 
+void config_I2C_0()
+{
+    i2c_init(I2C_0_PORT, 100*1000);                 // 100kHz
+    gpio_set_function(I2C_0_SDA, GPIO_FUNC_I2C);
+    gpio_set_function(I2C_0_SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(I2C_0_SDA);
+    gpio_pull_up(I2C_0_SCL);
+    // https://github.com/raspberrypi/pico-examples/tree/master/i2c
+}
+
+void config_SPI_0()
+{
+    // SPI initialisation
+    spi_init(SPI_0_PORT, 1000*1000);                  // 1MHz
+    gpio_set_function(SPI_0_MISO, GPIO_FUNC_SPI);
+    gpio_set_function(SPI_0_CS,   GPIO_FUNC_SIO);
+    gpio_set_function(SPI_0_SCK,  GPIO_FUNC_SPI);
+    gpio_set_function(SPI_0_MOSI, GPIO_FUNC_SPI);
+    // Chip select is active-low, so we'll initialise it to a driven-high state
+    gpio_set_dir(SPI_0_CS, GPIO_OUT);
+    gpio_put(SPI_0_CS, 1);
+    // https://github.com/raspberrypi/pico-examples/tree/master/spi
+}
+
+void config_UART_0()
+{
+    // Set up our UART
+    uart_init(UART_0_PORT, UART_0_BAUD_RATE);
+    // Set the TX and RX pins by using the function select on the GPIO
+    // Set datasheet for more information on function select
+    gpio_set_function(UART_0_TX, GPIO_FUNC_UART);
+    gpio_set_function(UART_0_RX, GPIO_FUNC_UART);
+    
+    // Use some the various UART functions to send out data
+    // In a default system, printf will also output via the default UART
+    // Send out a string, with CR/LF conversions
+    // uart_puts(UART_0_PORT, " Hello, UART!\n");
+    // For more examples of UART use see https://github.com/raspberrypi/pico-examples/tree/master/uart
+}
+
+
 
 /*============================================================================================================================================================================
 Main Funsion
@@ -238,43 +278,17 @@ int main()
         return -1;
     }
 
-    i2c_init(I2C_PORT_0, 100*1000);
-    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
-    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
-    gpio_pull_up(I2C_SDA);
-    gpio_pull_up(I2C_SCL);
+    config_I2C_0();
 
+    config_SPI_0();
 
-
-    // https://github.com/raspberrypi/pico-examples/tree/master/i2c
-
+    config_UART_0();
+   
     
     
-    
-    
-        // // SPI initialisation
-    // spi_init(SPI_PORT, 1000*1000);                  // 1MHz
-    // gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
-    // gpio_set_function(PIN_CS,   GPIO_FUNC_SIO);
-    // gpio_set_function(PIN_SCK,  GPIO_FUNC_SPI);
-    // gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
-    // // Chip select is active-low, so we'll initialise it to a driven-high state
-    // gpio_set_dir(PIN_CS, GPIO_OUT);
-    // gpio_put(PIN_CS, 1);
-    // https://github.com/raspberrypi/pico-examples/tree/master/spi
 
-    // // Set up our UART
-    // uart_init(UART_ID, BAUD_RATE);
-    // // Set the TX and RX pins by using the function select on the GPIO
-    // // Set datasheet for more information on function select
-    // gpio_set_function(UART_TX_PIN, GPIO_FUNC_UART);
-    // gpio_set_function(UART_RX_PIN, GPIO_FUNC_UART);
+
     
-    // Use some the various UART functions to send out data
-    // In a default system, printf will also output via the default UART
-    // Send out a string, with CR/LF conversions
-    // uart_puts(UART_ID, " Hello, UART!\n");
-    // For more examples of UART use see https://github.com/raspberrypi/pico-examples/tree/master/uart
 
 
     blink(1000);
