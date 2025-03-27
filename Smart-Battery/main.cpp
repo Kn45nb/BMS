@@ -284,7 +284,7 @@ int main()
 
     config_UART_0();
    
-    
+    uart_puts(UART_0_PORT, "0x00");
     
 
 
