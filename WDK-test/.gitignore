@@ -1,2 +1,6 @@
-# Cache
+# Folder
 /.vscode
+
+# File
+.env
+*.log
